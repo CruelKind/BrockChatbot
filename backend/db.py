@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 from pymongo import MongoClient
 import pymongo
 import scrape
@@ -38,11 +39,29 @@ def insertManyIntoTable(tableName,data):
         input.append({j:data[i][template_keys.index(j)] for j in template_keys})
 
     res = []
+
+
     ## keyGen and check
+
+    genderField = False
+    
+    if ("gender" in input[0]):  genderField = True #If there is a Gender Field in DB
+    #for i in range (len(input)):
+        
     for i in range(len(input)):
+
         input[i]["key"]="".join(data[i])
+
+        input[i]["key"] = input[i]["key"].replace (" ","") #Removes spaces from Key
+
+        if genderField: 
+            input[i]["gender"] = gender_function(data[i][2]) #if there is a key of Gender -> Simplify gender key field
+         
         if checkIfExists(table,input[i]["key"])==False:
             res.append(input[i])
+
+
+        
     if len(res)>0:
         table.insert_many(res)
         
@@ -54,8 +73,10 @@ def insertIntoTable(tableName,data):
     table = db[tableName]
     template = getTemplate(tableName)
     template_keys = list(template.keys())
+
     for i in range(len(template_keys)):
         template[template_keys[i]]=data[i]
+
     template["key"]="".join(data)
     ## keyGen and check
     if checkIfExists(table,template["key"]):
@@ -73,6 +94,24 @@ def checkIfExists(table,key):
         if key in keys:
             return True
     return False
+
+#Simplifies Gender Key Field into Male, Female, Team Mixed, and Para 
+def gender_function (gender):
+
+    male = "Male"
+    paramale = "Para Male"
+    female = "Female"
+    parafemale = "Para Female"
+    if paramale in gender:
+        return paramale
+    elif male in gender:
+        return male
+    elif parafemale in gender:
+        return parafemale
+    elif female in gender:
+        return female
+    else:
+        return "Team Mixed"
     
 
 if __name__ == "__main__":
@@ -81,12 +120,12 @@ if __name__ == "__main__":
     #insertManyIntoTable("athlete_sport",scrape.scrapeAthleteData_gemspro())
     #returnTableData("athlete_sport")
 
-    ##test
+    #test
     #insertIntoTable("schedule",["1","2","3","4","5"])
     
     
-    # insertManyIntoTable("schedule",scrape.scrapeSchedule_niagaragames())
-    # returnTableData("schedule")
+    insertManyIntoTable("schedule",scrape.scrapeSchedule_niagaragames())
+    returnTableData("schedule")
 
     
     pass
