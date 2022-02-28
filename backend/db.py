@@ -12,7 +12,8 @@ CONNECTION_STRING = "mongodb+srv://dbUser:Cosc4P01@chatbot.lorgj.mongodb.net/tes
 def getTemplate(template):
     templates = {
         "schedule":{"time":"","sport": "","gender": "","pool": "","location": ""},
-        "athlete_sport":{"athlete":"","sport":""}
+        "athlete_sport":{"athlete":"","sport":""},
+        "contacts":{"address":"","phone":""}
     }
     return templates[template].copy()
 
@@ -60,8 +61,6 @@ def insertManyIntoTable(tableName,data):
         if checkIfExists(table,input[i]["key"])==False:
             res.append(input[i])
 
-
-        
     if len(res)>0:
         table.insert_many(res)
         
@@ -112,6 +111,12 @@ def gender_function (gender):
         return female
     else:
         return "Team Mixed"
+
+def make_contact ():
+    stringA = []
+    stringA[1] = "Unit 617L | 221 Glendale Ave, St. Catharines, ON L2T"
+    stringA[2] = "905-228-2103"
+    return stringA
     
 
 if __name__ == "__main__":
@@ -124,8 +129,10 @@ if __name__ == "__main__":
     #insertIntoTable("schedule",["1","2","3","4","5"])
     
     
-    insertManyIntoTable("schedule",scrape.scrapeSchedule_niagaragames())
-    returnTableData("schedule")
+    #insertManyIntoTable("schedule",scrape.scrapeSchedule_niagaragames())
+    #returnTableData("schedule")
 
+    insertManyIntoTable("contacts", ["905-228-2103, Unit 617L | 221 Glendale Ave, St. Catharines, ON L2T 2K9"])
+    returnTableData("contacts")
     
     pass
